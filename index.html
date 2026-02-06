@@ -824,10 +824,13 @@ function endDodge(){
 // === ENDINGS ===
 function showBattleVictory(){
     stopAllMusic();
-    playMusic('determinationMusic',0.5);
-    document.getElementById('battlePhase').style.display='none';
-    const end=document.getElementById('battleEndScreen');end.style.display='flex';
-    end.innerHTML=`<div class="emoji-big">⚔️</div>
+    playMusic('determinationMusic', 0.5);
+    document.getElementById('battlePhase').style.display = 'none';
+    const end = document.getElementById('battleEndScreen');
+    end.style.display = 'flex';
+    end.innerHTML = `
+        <img src="resources/imagen13.png" alt="Victoria" style="width: 200px; height: auto; margin-bottom: 20px;">
+        
         <div style="font-size:2.5rem;color:#ffff00;letter-spacing:3px;margin-bottom:20px">* ¡Has ganado la pelea!</div>
         <div style="font-size:1.5rem;color:#aaa;letter-spacing:2px;margin-bottom:30px">* Pero... ¿a qué coste?</div>
         <div style="font-size:1.2rem;color:#666">* Nuestro amor se desvanece...</div>

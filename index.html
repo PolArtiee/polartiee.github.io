@@ -45,7 +45,7 @@
         }
         @keyframes twinkle { 0%{opacity:0.2} 100%{opacity:1} }
 
-        /* === CONVERSATION === */
+        /* conversación */
         #conversationPhase {
             width:100%; min-height:100vh; display:flex; justify-content:center;
             align-items:center; padding:20px; z-index:1; position:relative;
@@ -139,7 +139,7 @@
         .pixel-heart-float { position:fixed; font-size:1.5rem; animation:phf 4s ease-out forwards; pointer-events:none; z-index:10; }
         @keyframes phf { 0%{opacity:1;transform:translateY(0)} 100%{opacity:0;transform:translateY(-100vh)} }
 
-        /* === BATTLE TRANSITION === */
+        /* transicion de batalla */
         #battleTransition {
             display:none; position:fixed; top:0;left:0;right:0;bottom:0;
             background:#000; z-index:100; justify-content:center; align-items:center;
@@ -151,7 +151,7 @@
             100%{transform:scale(50) rotate(720deg);opacity:0}
         }
 
-        /* === BATTLE - DOUBLED === */
+        /* batalla - doubled */
         #battlePhase {
             display:none; width:100%; height:100vh; flex-direction:column;
             align-items:center; justify-content:flex-start; padding-top:10px;
@@ -257,11 +257,11 @@
 <body>
 <div class="stars" id="starsContainer"></div>
 
-<!-- AUDIO: Conversation music -->
+<!-- undertale musica 1 -->
 <audio id="charlaMusic" loop>
     <source src="resources/charla.mp3" type="audio/mpeg">
 </audio>
-<!-- AUDIO: Determination music (victory/defeat) -->
+<!-- musica visctoria/derrota -->
 <audio id="determinationMusic" loop>
     <source src="resources/determination.mp3" type="audio/mpeg">
 </audio>
@@ -369,7 +369,7 @@ function stopAllMusic(){
     stopMusic('determinationMusic');
 }
 
-// Start conversation music on first user interaction
+// empieza conver
 let charlaStarted=false;
 function ensureCharlaMusic(){
     if(charlaStarted)return;
@@ -514,9 +514,8 @@ function createFloatingHearts(){
     },i*300)}
 }
 
-// ================================================================
-//  BATTLE SYSTEM - FIXED FLOW
-// ================================================================
+
+//  systema de batalla
 let B={enemyHp:100,enemyMaxHp:100,playerHp:20,playerMaxHp:20,apologyCount:0,phase:'none'};
 
 const apologyTexts=[
@@ -625,7 +624,7 @@ function updateHp(){
     document.getElementById('playerHpText').textContent=`${Math.max(0,B.playerHp)} / ${B.playerMaxHp}`;
 }
 
-// === PLAYER TURN ===
+// turno de la churri
 function playerTurn(){
     B.phase='playerChoice';
     hideUI();
@@ -636,7 +635,7 @@ function playerTurn(){
     document.getElementById('dialogText').innerHTML=enemyIdleTexts[Math.floor(Math.random()*enemyIdleTexts.length)];
 }
 
-// === FIGHT ===
+// lucha
 let atkActive=false,atkPos=0,atkDir=1,atkAnim=null;
 
 function selectFight(){
@@ -709,7 +708,7 @@ function drawSlash(){
 }
 function clearSlash(){document.getElementById('slashCanvas').getContext('2d').clearRect(0,0,260,260)}
 
-// === ACT ===
+// acto
 function selectAct(){
     if(B.phase!=='playerChoice')return;
     B.phase='actMenu';
@@ -742,14 +741,14 @@ function doLaugh(){
     showDialog(txt+`\n* (Disculpas: ${B.apologyCount}/6)`,()=>{enemyTurn()});
 }
 
-// === ENEMY TURN ===
+// mi turno
 function enemyTurn(){
     hideUI();setSprite('talk');
     const txt=enemyAttackTexts[Math.floor(Math.random()*enemyAttackTexts.length)];
     showDialog(txt,()=>{setSprite('idle');startDodge()});
 }
 
-// === DODGE ===
+// esquiva
 let playerX,playerY,dodgeActive=false,dodgeTimer=null,projectiles=[],dodgeFrame=null;
 
 function startDodge(){
@@ -821,7 +820,7 @@ function endDodge(){
     if(B.playerHp>0)playerTurn();
 }
 
-// === ENDINGS ===
+// finales
 function showBattleVictory(){
     stopAllMusic();
     playMusic('determinationMusic', 0.5);

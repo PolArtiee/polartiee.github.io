@@ -1,1 +1,861 @@
-# amuuur.github.io
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Un mensaje para ti</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            image-rendering: pixelated;
+            -ms-interpolation-mode: nearest-neighbor;
+        }
+
+        body {
+            font-family: 'Courier New', Courier, monospace;
+            background: #000;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+            color: #fff;
+            -webkit-font-smoothing: none;
+            -moz-osx-font-smoothing: unset;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: repeating-linear-gradient(
+                0deg, transparent, transparent 2px,
+                rgba(0,0,0,0.08) 2px, rgba(0,0,0,0.08) 4px
+            );
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        .stars { position: fixed; top:0;left:0;right:0;bottom:0; z-index:0; pointer-events:none; }
+        .star {
+            position: absolute; width:3px; height:3px; background:#fff;
+            animation: twinkle 3s infinite ease-in-out alternate;
+        }
+        @keyframes twinkle { 0%{opacity:0.2} 100%{opacity:1} }
+
+        /* === CONVERSATION === */
+        #conversationPhase {
+            width:100%; min-height:100vh; display:flex; justify-content:center;
+            align-items:center; padding:20px; z-index:1; position:relative;
+        }
+        .message-box {
+            width:100%; max-width:1200px; display:flex; flex-direction:row;
+            justify-content:center; align-items:center; gap:50px;
+            animation:fadeIn .4s ease-out; transition:opacity .3s ease;
+        }
+        .left-column { display:flex; flex-direction:column; align-items:center; flex:1; max-width:650px; }
+        .boy-image {
+            width:100%; max-width:400px; height:260px; object-fit:cover;
+            margin-bottom:30px; border:4px solid #fff;
+        }
+        .girl-image {
+            width:400px; height:580px; object-fit:cover; border:4px solid #fff;
+            transition:transform .3s ease;
+        }
+        .girl-image:hover { transform:scale(1.02); }
+        @keyframes fadeIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+
+        .message {
+            font-size:1.6rem; color:#fff; margin-bottom:35px; line-height:1.5;
+            text-align:center; letter-spacing:1px; text-shadow:2px 2px 0 #333;
+        }
+        .special-message {
+            font-size:2.2rem; font-weight:bold; color:#ffff00; display:block;
+            margin-top:10px; text-shadow:3px 3px 0 #aa7700;
+            animation:pulse-glow 1.5s infinite ease-in-out;
+        }
+        @keyframes pulse-glow {
+            0%,100%{text-shadow:3px 3px 0 #aa7700,0 0 10px rgba(255,255,0,.3)}
+            50%{text-shadow:3px 3px 0 #aa7700,0 0 25px rgba(255,255,0,.6)}
+        }
+        .buttons { display:flex; flex-direction:column; gap:16px; width:100%; max-width:500px; }
+        .btn {
+            padding:18px 30px; font-size:1.1rem; font-family:'Courier New',Courier,monospace;
+            border:3px solid #fff; cursor:pointer; transition:all .15s ease;
+            background:#000; color:#fff; letter-spacing:1px; text-align:left; position:relative;
+        }
+        .btn::before { content:'❤ '; color:#ff0000; opacity:0; transition:opacity .15s; }
+        .btn:hover { background:#333; border-color:#ffff00; color:#ffff00; }
+        .btn:hover::before { opacity:1; }
+        .btn-primary { border-color:#aaa; }
+        .btn-primary:hover { border-color:#ffff00; }
+
+        .btn-romantic {
+            border-color:#ff6b9d!important; background:linear-gradient(90deg,#1a0010,#2a0020)!important;
+            color:#ffb6c1!important; animation:romantic-pulse 2s infinite ease-in-out;
+            position:relative; overflow:hidden;
+        }
+        .btn-romantic::before { content:'💕 '; opacity:1!important; color:#ff6b9d; }
+        .btn-romantic::after {
+            content:''; position:absolute; top:0; left:-100%; width:100%; height:100%;
+            background:linear-gradient(90deg,transparent,rgba(255,107,157,.15),transparent);
+            animation:shimmer 3s infinite;
+        }
+        @keyframes shimmer { 0%{left:-100%} 100%{left:100%} }
+        @keyframes romantic-pulse {
+            0%,100%{box-shadow:0 0 8px rgba(255,107,157,.3),inset 0 0 8px rgba(255,107,157,.1)}
+            50%{box-shadow:0 0 20px rgba(255,107,157,.6),inset 0 0 15px rgba(255,107,157,.2)}
+        }
+        .btn-romantic:hover { border-color:#ff9dbd!important; color:#fff!important; background:linear-gradient(90deg,#2a0020,#3a0030)!important; }
+
+        .btn-fire {
+            border-color:#ff4400!important; background:#1a0500!important; color:#ff6633!important;
+            position:relative; overflow:hidden; animation:fire-shake .15s infinite alternate;
+        }
+        .btn-fire::before { content:'🔥 '; opacity:1!important; color:#ff4400; }
+        @keyframes fire-shake { 0%{transform:translateX(-1px)} 100%{transform:translateX(1px)} }
+        .fire-particle {
+            position:absolute; width:6px; height:8px; background:#ff4400;
+            animation:fire-rise .8s infinite ease-out; pointer-events:none; z-index:2;
+        }
+        @keyframes fire-rise {
+            0%{opacity:1;transform:translateY(0) scale(1);background:#ff4400}
+            50%{background:#ff8800}
+            100%{opacity:0;transform:translateY(-30px) scale(.3);background:#ffcc00}
+        }
+        .btn-fire:hover { border-color:#ff6600!important; color:#ffaa00!important; background:#2a0800!important; }
+
+        .end-screen { text-align:center; width:100%; }
+        .emoji-big { font-size:5rem; display:block; margin-bottom:25px; }
+        .te-amo-text {
+            font-size:4rem; color:#ffff00; text-shadow:4px 4px 0 #aa7700;
+            animation:te-amo-beat 1s infinite ease-in-out; margin-bottom:30px; letter-spacing:8px;
+        }
+        @keyframes te-amo-beat { 0%,100%{transform:scale(1)} 50%{transform:scale(1.08)} }
+        .pixel-confetti { position:fixed; width:8px; height:8px; animation:pcf 3s ease-out forwards; z-index:10; }
+        @keyframes pcf { to{transform:translateY(100vh) rotate(720deg);opacity:0} }
+        .pixel-heart-float { position:fixed; font-size:1.5rem; animation:phf 4s ease-out forwards; pointer-events:none; z-index:10; }
+        @keyframes phf { 0%{opacity:1;transform:translateY(0)} 100%{opacity:0;transform:translateY(-100vh)} }
+
+        /* === BATTLE TRANSITION === */
+        #battleTransition {
+            display:none; position:fixed; top:0;left:0;right:0;bottom:0;
+            background:#000; z-index:100; justify-content:center; align-items:center;
+        }
+        .transition-heart { font-size:4rem; color:#ff0000; animation:tspin 1.5s ease-in-out forwards; }
+        @keyframes tspin {
+            0%{transform:scale(0) rotate(0);opacity:0}
+            50%{transform:scale(2) rotate(360deg);opacity:1}
+            100%{transform:scale(50) rotate(720deg);opacity:0}
+        }
+
+        /* === BATTLE - DOUBLED === */
+        #battlePhase {
+            display:none; width:100%; height:100vh; flex-direction:column;
+            align-items:center; justify-content:flex-start; padding-top:10px;
+            z-index:1; position:relative; overflow-y:auto;
+        }
+        .battle-container {
+            width:960px; max-width:98vw; display:flex; flex-direction:column;
+            align-items:center; gap:6px;
+        }
+        .enemy-area { display:flex; flex-direction:column; align-items:center; margin-bottom:2px; }
+        .enemy-sprite-wrap { position:relative; display:inline-block; }
+        .enemy-sprite { width:260px; height:260px; object-fit:contain; transition:transform .1s; }
+        .enemy-sprite.hurt { animation:ehf .1s 5 alternate; }
+        @keyframes ehf { 0%{filter:brightness(1)} 100%{filter:brightness(3) hue-rotate(180deg)} }
+
+        .enemy-hp-area { width:500px; max-width:90vw; margin-top:6px; text-align:center; }
+        .enemy-name { font-size:1.6rem; color:#fff; margin-bottom:4px; letter-spacing:3px; }
+        .hp-bar-outer { width:100%; height:28px; background:#300; border:3px solid #fff; }
+        .hp-bar-inner { height:100%; background:#0f0; transition:width .5s ease; }
+        .hp-bar-inner.low { background:#ff0; }
+        .hp-bar-inner.critical { background:#f00; }
+        .hp-text { font-size:1.2rem; color:#fff; margin-top:3px; }
+
+        .battle-dialog {
+            width:820px; max-width:96vw; min-height:120px; border:4px solid #fff;
+            background:#000; padding:24px 30px; font-size:1.5rem; line-height:1.7;
+            color:#fff; letter-spacing:1px; position:relative; cursor:pointer;
+        }
+        .dialog-text { min-height:50px; white-space:pre-wrap; }
+        .dialog-advance {
+            position:absolute; bottom:10px; right:16px; color:#ffff00;
+            animation:blink .8s infinite; font-size:1.6rem;
+        }
+        @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+        .attack-bar-container {
+            width:600px; max-width:90vw; height:56px; border:4px solid #fff;
+            background:#000; position:relative; display:none; margin-top:6px;
+        }
+        .attack-bar-green { position:absolute; width:36px; height:100%; background:#0f0; left:50%; transform:translateX(-50%); }
+        .attack-bar-cursor { position:absolute; width:8px; height:100%; background:#fff; top:0; }
+
+        .battle-box-wrapper { position:relative; margin-top:6px; }
+        .battle-box {
+            width:600px; height:320px; max-width:96vw; border:4px solid #fff;
+            background:#000; position:relative; overflow:hidden;
+        }
+        .projectile { position:absolute; z-index:3; pointer-events:none; }
+
+        .player-stats { display:flex; align-items:center; gap:16px; margin-top:8px; font-size:1.3rem; }
+        .player-name-battle { color:#fff; letter-spacing:3px; }
+        .player-hp-bar-outer { width:200px; height:24px; background:#300; border:3px solid #fff; }
+        .player-hp-bar-inner { height:100%; background:#ff0; transition:width .3s ease; }
+
+        .battle-actions { display:none; gap:28px; margin-top:12px; }
+        .battle-btn {
+            padding:18px 42px; font-size:1.5rem; font-family:'Courier New',Courier,monospace;
+            border:4px solid #ff8800; background:#000; color:#ff8800; cursor:pointer;
+            letter-spacing:3px; transition:all .15s; text-transform:uppercase;
+        }
+        .battle-btn:hover { background:#ff8800; color:#000; }
+        .battle-btn-act { border-color:#ffff00; color:#ffff00; }
+        .battle-btn-act:hover { background:#ffff00; color:#000; }
+
+        .act-submenu { display:none; gap:20px; margin-top:8px; }
+        .act-sub-btn {
+            padding:14px 32px; font-size:1.3rem; font-family:'Courier New',Courier,monospace;
+            border:4px solid #00ccff; background:#000; color:#00ccff; cursor:pointer;
+            letter-spacing:2px; transition:all .15s;
+        }
+        .act-sub-btn:hover { background:#00ccff; color:#000; }
+        .act-sub-btn.laugh { border-color:#ff4444; color:#ff4444; }
+        .act-sub-btn.laugh:hover { background:#ff4444; color:#000; }
+
+        .damage-popup {
+            position:absolute; font-size:3rem; color:#ff0000; font-weight:bold;
+            animation:dmgf 1.5s ease-out forwards; pointer-events:none; z-index:20;
+            text-shadow:3px 3px 0 #000;
+        }
+        @keyframes dmgf { 0%{opacity:1;transform:translateY(0)} 100%{opacity:0;transform:translateY(-80px)} }
+
+        .battle-end-screen {
+            display:none; position:fixed; top:0;left:0;right:0;bottom:0;
+            background:#000; z-index:200; flex-direction:column;
+            justify-content:center; align-items:center; text-align:center;
+        }
+
+        @media(max-width:900px) {
+            .message-box{flex-direction:column;gap:30px}
+            .girl-image{width:100%;max-width:350px;height:450px}
+            .boy-image{max-width:100%;height:250px}
+            .message{font-size:1.3rem} .special-message{font-size:1.8rem}
+            .battle-dialog{font-size:1.1rem;padding:18px;min-height:90px}
+            .battle-box{width:95vw;height:250px}
+            .attack-bar-container{width:95vw;height:44px}
+            .enemy-sprite{width:180px;height:180px}
+            .enemy-hp-area{width:90vw}
+            .battle-btn{padding:14px 26px;font-size:1.2rem}
+            .act-sub-btn{padding:12px 22px;font-size:1.1rem}
+        }
+    </style>
+</head>
+<body>
+<div class="stars" id="starsContainer"></div>
+
+<!-- AUDIO: Conversation music -->
+<audio id="charlaMusic" loop>
+    <source src="resources/charla.mp3" type="audio/mpeg">
+</audio>
+<!-- AUDIO: Determination music (victory/defeat) -->
+<audio id="determinationMusic" loop>
+    <source src="resources/determination.mp3" type="audio/mpeg">
+</audio>
+
+<div id="conversationPhase">
+    <div class="message-box" id="messageBox">
+        <div class="left-column">
+            <img id="boyImage" src="" alt="Chico" class="boy-image">
+            <div class="message" id="message">Hola Amor</div>
+            <div class="buttons" id="buttons">
+                <button class="btn btn-primary" onclick="choose('B1')">Hola...</button>
+                <button class="btn btn-primary" onclick="choose('B2')">Amor, ¿qué es esto?</button>
+                <button class="btn" onclick="choose('B3')">...</button>
+            </div>
+        </div>
+        <img id="girlImage" src="" alt="Chica" class="girl-image">
+    </div>
+</div>
+
+<div id="battleTransition"><div class="transition-heart">❤</div></div>
+
+<div id="battlePhase">
+    <audio id="battleMusic" loop>
+        <source src="resources/battle_music.mp3" type="audio/mpeg">
+        <source src="resources/battle_music.ogg" type="audio/ogg">
+    </audio>
+    <div class="battle-container">
+        <div class="enemy-area">
+            <div class="enemy-sprite-wrap" id="enemySpriteWrap">
+                <img id="enemySprite" src="resources/image9.png" alt="Enemy" class="enemy-sprite">
+                <canvas id="slashCanvas" width="260" height="260" style="position:absolute;top:0;left:0;pointer-events:none;"></canvas>
+            </div>
+            <div class="enemy-hp-area">
+                <div class="enemy-name">TU AMOR</div>
+                <div class="hp-bar-outer"><div class="hp-bar-inner" id="enemyHpBar" style="width:100%"></div></div>
+                <div class="hp-text" id="enemyHpText">HP 100 / 100</div>
+            </div>
+        </div>
+        <div class="battle-dialog" id="battleDialog" onclick="handleDialogClick()">
+            <div class="dialog-text" id="dialogText"></div>
+            <div class="dialog-advance" id="dialogAdvance" style="display:none;">▼</div>
+        </div>
+        <div class="attack-bar-container" id="attackBar">
+            <div class="attack-bar-green"></div>
+            <div class="attack-bar-cursor" id="attackCursor" style="left:0"></div>
+        </div>
+        <div class="battle-box-wrapper">
+            <div class="battle-box" id="battleBox" style="display:none;">
+                <div id="playerHeart" style="position:absolute;width:28px;height:28px;">
+                    <svg viewBox="0 0 16 16" width="28" height="28" style="display:block;">
+                        <rect x="3" y="0" width="4" height="3" fill="#ff0000"/>
+                        <rect x="9" y="0" width="4" height="3" fill="#ff0000"/>
+                        <rect x="1" y="2" width="14" height="3" fill="#ff0000"/>
+                        <rect x="1" y="5" width="14" height="3" fill="#ff0000"/>
+                        <rect x="2" y="8" width="12" height="2" fill="#ff0000"/>
+                        <rect x="3" y="10" width="10" height="2" fill="#ff0000"/>
+                        <rect x="5" y="12" width="6" height="2" fill="#ff0000"/>
+                        <rect x="7" y="14" width="2" height="2" fill="#ff0000"/>
+                    </svg>
+                </div>
+            </div>
+        </div>
+        <div class="player-stats">
+            <span class="player-name-battle">❤ TÚ</span>
+            <span>HP</span>
+            <div class="player-hp-bar-outer"><div class="player-hp-bar-inner" id="playerHpBar" style="width:100%"></div></div>
+            <span id="playerHpText">20 / 20</span>
+        </div>
+        <div class="battle-actions" id="battleActions">
+            <button class="battle-btn" onclick="selectFight()">⚔ LUCHAR</button>
+            <button class="battle-btn battle-btn-act" onclick="selectAct()">💬 DIALOGAR</button>
+        </div>
+        <div class="act-submenu" id="actSubmenu">
+            <button class="act-sub-btn" onclick="doApologize()">Disculparse</button>
+            <button class="act-sub-btn laugh" onclick="doLaugh()">Reírse</button>
+        </div>
+    </div>
+</div>
+
+<div class="battle-end-screen" id="battleEndScreen"></div>
+
+<script>
+// Stars
+(function(){const c=document.getElementById('starsContainer');for(let i=0;i<60;i++){const s=document.createElement('div');s.className='star';s.style.left=Math.random()*100+'%';s.style.top=Math.random()*100+'%';s.style.animationDelay=Math.random()*3+'s';s.style.opacity=Math.random()*.5+.2;c.appendChild(s)}})();
+
+// === MUSIC HELPERS ===
+function playMusic(id, vol){
+    try{
+        const m=document.getElementById(id);
+        m.volume=vol||0.5;
+        m.currentTime=0;
+        m.play().catch(()=>{});
+    }catch(e){}
+}
+function stopMusic(id){
+    try{
+        const m=document.getElementById(id);
+        m.pause();
+        m.currentTime=0;
+    }catch(e){}
+}
+function stopAllMusic(){
+    stopMusic('charlaMusic');
+    stopMusic('battleMusic');
+    stopMusic('determinationMusic');
+}
+
+// Start conversation music on first user interaction
+let charlaStarted=false;
+function ensureCharlaMusic(){
+    if(charlaStarted)return;
+    charlaStarted=true;
+    playMusic('charlaMusic',0.4);
+}
+
+// Images
+const myImages=['resources/image.png','resources/image2.png','resources/image3.png','resources/image4.png','resources/image5.png','resources/image6.png'];
+const myImages2=['resources/carla1.png','resources/carla2.png','resources/carla3.png','resources/carla4.png','resources/carla5.png'];
+function setRandomImages(){
+    const b=document.getElementById('boyImage'),g=document.getElementById('girlImage');
+    if(b&&myImages.length)b.src=myImages[Math.floor(Math.random()*myImages.length)];
+    if(g&&myImages2.length)g.src=myImages2[Math.floor(Math.random()*myImages2.length)];
+}
+setRandomImages();
+
+// Conversation flow
+const flow={
+'B1':{msg:'* Te preparé algo especial :D',btns:[{txt:'Oooh ¿qué es?',next:'C1'}]},
+'B2':{msg:'* Te preparé algo especial :D',btns:[{txt:'Oooh ¿qué es?',next:'C1'}]},
+'B3':{msg:'* ¿Estás ahí bebé? :3',btns:[{txt:'Sí sí, perdona',next:'D1'},{txt:'...',next:'C2'}]},
+'C2':{msg:'* ¿Te pasa algo amor? :(',btns:[{txt:'No, nada, cuéntame',next:'D3'},{txt:'Estoy ocupada',next:'C4'}]},
+'C4':{msg:'* Vale... te escribo luego entonces :(',btns:[{txt:'Cerrar página',next:'END_SAD'}]},
+'D1':{msg:'* Te preparé algo especial :D',btns:[{txt:'Cuéntame',next:'C1'}]},
+'D3':{msg:'* Te preparé algo especial :D',btns:[{txt:'Cuéntame',next:'C1'}]},
+'C1':{msg:'* Espero que no te imagines de qué estoy hablando... >:D',btns:[{txt:'No, ¿de qué se trata? :3',next:'F1'},{txt:'Me lo puedo imaginar...',next:'F2'},{txt:'Ay no, ¿qué hiciste ahora?',next:'F3'},{txt:'...',next:'F4'}]},
+'F4':{msg:'* ¿Amor?',btns:[{txt:'Perdona, ¿de qué se trata?',next:'F1'},{txt:'Que síii, cuentaaa',next:'F5'}]},
+'F1':{msg:'* ¡¡Menos mal cari!! Si te lo imaginases, perdería la gracia :D (por ser wena: RA-NCFVUAMYSR3REHXZ)',btns:[{txt:'Jajaja vale, cuéntame entonces',next:'G1'}]},
+'F5':{msg:'* ¡¡Menos mal cari!! Si te lo imaginases, perdería la gracia :D',btns:[{txt:'Jajaja vale, cuéntame entonces',next:'G1'}]},
+'F2':{msg:'* Ah... ¿en serio te lo imaginas?',btns:[{txt:'Era broma, no me lo imagino jaja',next:'G2'},{txt:'...',next:'G3'}]},
+'G3':{msg:'* Ok, pues nada :(',btns:[{txt:'¡AMOR NO! Igualmente quiero saber',next:'I1'},{txt:'Vale, como quieras',next:'END_SAD'}]},
+'I1':{msg:'* ¿En serio? ¡Yay! Es que si te lo imaginases, perdería la gracia :D',btns:[{txt:'Sí en serio, cuéntame ya jaja',next:'G1'}]},
+'F3':{msg:'* ¡Nada malo AMURR! Es algo bonito :3',btns:[{txt:'Ah vale, entonces cuéntame :3',next:'F1'}]},
+'G2':{msg:'* Jajaja menos mal, me asustaste',btns:[{txt:'Perdona jaja, ahora cuéntame',next:'G1'}]},
+'G1':{msg:'* Bueno, pues...',btns:[{txt:'Cuéntame bebé :3',next:'J1'},{txt:'Dale pues, suéltalo ya',next:'J2'},{txt:'Me estás asustando jajaja',next:'J3'}]},
+'J3':{msg:'* Que no bebé, es algo bueno hehe',btns:[{txt:'Ah vale jaja, cuéntame',next:'J1'}]},
+'J1':{msg:'* Ta bien, allá voy... (pa mi foquita mientras me preparo: RA-NLTXZW985PUVKVE9)',btns:[{txt:':3',next:'L1'}]},
+'J2':{msg:'* Vale vale, allá voy...',btns:[{txt:':3',next:'L1'}]},
+'L1':{msg:'* Bueno... dentro de poco... se aproxima... ya sabes...',btns:[{txt:'¿Qué se aproxima?',next:'M1'}]},
+'M1':{msg:'* Una fecha especial...',btns:[{txt:'¿El qué bebé...?',next:'N1'},{txt:'San Valen...',next:'N2'},{txt:'¿Tu cumple?',next:'N3'},{txt:'Ni idea amor',next:'N4'}]},
+'N3':{msg:'* Nooo jajaja, eso es en otro mes tonta',btns:[{txt:'Aah ¿entonces qué?',next:'N1'}]},
+'N4':{msg:'* Piensa un poquito :3',btns:[{txt:'Ummm... ¿el qué?',next:'N1'},{txt:'¡San Valentín!',next:'N2'}]},
+'N1':{msg:'* San Valentííín :D',btns:[{txt:'Aaaah verdad jeje',next:'Q1'},{txt:'Oh... ya veo por dónde vas',next:'Q2'}]},
+'N2':{msg:'* ¡Exactooo bebé!',btns:[{txt:'Aaaah jeje',next:'Q1'},{txt:'Oh... ya veo por dónde vas',next:'Q2'}]},
+'Q1':{msg:'* Síii... y quería preguntarte algo...',btns:[{txt:'¿El qué? :3',next:'S1'},{txt:'Dime dime',next:'S2'},{txt:'Pregunta lo que quieras amor',next:'S3'},{txt:'No me interesa',next:'END_SAD'}]},
+'Q2':{msg:'* Síii... y quería preguntarte algo...',btns:[{txt:'¿El qué? :3',next:'S1'},{txt:'Dime dime',next:'S2'},{txt:'Pregunta lo que quieras amor',next:'S3'},{txt:'No me interesa',next:'END_SAD'}]},
+'S1':{msg:'* Es que... no sé cómo decirlo...',btns:[{txt:'Tranqui amor, tómate tu tiempo :3',next:'U1'},{txt:'Ya suéltalo jajaja',next:'U2'},{txt:'...',next:'U3'}]},
+'S2':{msg:'* Es que... no sé cómo decirlo...',btns:[{txt:'Tranqui amor, tómate tu tiempo :3',next:'U1'},{txt:'Ya suéltalo jajaja',next:'U2'},{txt:'...',next:'U3'}]},
+'S3':{msg:'* Aww eres tan linda, mi amor',btns:[{txt:'Gracias bebé, pregunta :3',next:'V1'}]},
+'U3':{msg:'* ¿Sigues ahí? Es que me pongo nervioso hehe',btns:[{txt:'Sí, tranqui, tómate tu tiempo :3',next:'U1'},{txt:'Sí sí, aquí estoy bebé',next:'U4'}]},
+'U1':{msg:'* Gracias amor... oki... allá voy...',btns:[{txt:'Te escucho',next:'V1'}]},
+'U2':{msg:'* Jajaja oki oki... allá voy...',btns:[{txt:'Dale',next:'V1'}]},
+'U4':{msg:'* Oki... allá voy...',btns:[{txt:'...',next:'V1'}]},
+'V1':{msg:'* *respiración profunda*',btns:[{txt:'...',next:'X1'}]},
+'X1':{msg:'* Amor...',btns:[{txt:'¿Sí?',next:'Z1'},{txt:'Dimeee',next:'Z1'},{txt:'...',next:'Z1'}]},
+'Z1':{msg:'* Sé que llevamos un tiempo juntos...',btns:[{txt:'Sí... :3',next:'AA1'},{txt:'Ajá...',next:'AA2'}]},
+'AA1':{msg:'* Y cada día me gustas más...',btns:[{txt:'Aww bebé',next:'DD1'},{txt:'Tú también a mí',next:'DD1'},{txt:'...',next:'CC3'}]},
+'AA2':{msg:'* Y cada día me gustas más...',btns:[{txt:'Aww bebé',next:'DD1'},{txt:'Tú también a mí',next:'DD1'},{txt:'...',next:'CC3'}]},
+'CC3':{msg:'* ¿Estás bien amor?',btns:[{txt:'S-sí... es que me emociono...',next:'DD1'}]},
+'DD1':{msg:'* Por eso quería preguntarte...',btns:[{txt:'Pregunta :3',next:'GG1'},{txt:'Te escucho bebé',next:'GG1'}]},
+'GG1':{msg:'<span class="special-message">🩷 ¿QUIERES SER MI SAN VALENTÍN? 🩷</span>',btns:[
+    {txt:'¡¡¡SÍÍÍÍ!!!',next:'END_HAPPY',cls:'btn-romantic'},
+    {txt:'Sí, claro que sí amor',next:'END_HAPPY',cls:'btn-romantic'},
+    {txt:'Pensé que nunca preguntarías... ¡SÍ!',next:'END_HAPPY',cls:'btn-romantic'},
+    {txt:'No...',next:'START_BATTLE',cls:'btn-fire'}
+]}
+};
+
+function choose(next){
+    ensureCharlaMusic(); // Start music on first click
+    const mb=document.getElementById('messageBox');
+    mb.style.opacity='0';
+    setTimeout(()=>{
+        if(next==='END_HAPPY')showHappyEnding();
+        else if(next==='END_SAD')showSadEnding();
+        else if(next==='START_BATTLE')startBattleTransition();
+        else{setRandomImages();showMessage(next)}
+        mb.style.opacity='1';
+    },300);
+}
+
+function showMessage(key){
+    const data=flow[key], msgEl=document.getElementById('message'), btnEl=document.getElementById('buttons');
+    const b=document.getElementById('boyImage'),g=document.getElementById('girlImage');
+    if(b)b.style.display='block'; if(g)g.style.display='block';
+    msgEl.innerHTML=data.msg; btnEl.innerHTML='';
+    data.btns.forEach(bt=>{
+        const button=document.createElement('button');
+        button.className='btn btn-primary '+(bt.cls||'');
+        button.textContent=bt.txt;
+        button.onclick=()=>choose(bt.next);
+        btnEl.appendChild(button);
+        if(bt.cls==='btn-fire'){
+            const fi=setInterval(()=>{
+                if(!document.body.contains(button)){clearInterval(fi);return}
+                const p=document.createElement('div');p.className='fire-particle';
+                p.style.left=Math.random()*100+'%';p.style.bottom='0';
+                button.appendChild(p);setTimeout(()=>p.remove(),800);
+            },120);
+        }
+    });
+}
+
+function showHappyEnding(){
+    stopAllMusic();
+    playMusic('determinationMusic',0.5);
+    const mb=document.getElementById('messageBox');
+    ['boyImage','girlImage'].forEach(id=>{const e=document.getElementById(id);if(e)e.style.display='none'});
+    mb.innerHTML=`<div class="end-screen"><div class="end-happy">
+    <div class="emoji-big">
+        <img src="resources/kiss.png" alt="Kiss" style="width: 250px; height: auto;">
+    </div>
+    <div class="te-amo-text">T E  A M O</div>
+    <div style="font-size:1.8rem;color:#ffb6c1;letter-spacing:3px">* ¡Que ganas de que llegue el día MI AMOOR!</div>
+    <div style="font-size:1.8rem;color:#ffb6c1;letter-spacing:3px">* DE REGALITO AMUR: RA-XMYRLHEB22Q9T5VT</div>
+</div></div>`;
+    createPixelConfetti();createFloatingHearts();
+}
+function showSadEnding(){
+    stopAllMusic();
+    const mb=document.getElementById('messageBox');
+    ['boyImage','girlImage'].forEach(id=>{const e=document.getElementById(id);if(e)e.style.display='none'});
+    mb.innerHTML=`<div class="end-screen"><div class="emoji-big">💔</div><div style="font-size:2rem;color:#888;letter-spacing:3px">* Me la pela, ADSSSS FOCAAAAA...</div></div>`;
+}
+function createPixelConfetti(){
+    const colors=['#ff6b9d','#ff0000','#ffff00','#ff69b4','#ff85a8'];
+    for(let i=0;i<60;i++){setTimeout(()=>{
+        const c=document.createElement('div');c.className='pixel-confetti';
+        c.style.left=Math.random()*100+'vw';c.style.top='-10px';
+        c.style.backgroundColor=colors[Math.floor(Math.random()*colors.length)];
+        c.style.animationDuration=(Math.random()*2+2)+'s';c.style.position='fixed';
+        document.body.appendChild(c);setTimeout(()=>c.remove(),4000);
+    },i*50)}
+}
+function createFloatingHearts(){
+    for(let i=0;i<20;i++){setTimeout(()=>{
+        const h=document.createElement('div');h.className='pixel-heart-float';h.textContent='❤';
+        h.style.left=Math.random()*100+'vw';h.style.bottom='-30px';
+        h.style.color=['#ff0000','#ff6b9d','#ffb6c1'][Math.floor(Math.random()*3)];
+        document.body.appendChild(h);setTimeout(()=>h.remove(),4500);
+    },i*300)}
+}
+
+// ================================================================
+//  BATTLE SYSTEM - FIXED FLOW
+// ================================================================
+let B={enemyHp:100,enemyMaxHp:100,playerHp:20,playerMaxHp:20,apologyCount:0,phase:'none'};
+
+const apologyTexts=[
+    "* Hmph... ¿Crees que con eso basta?",
+    "* ... Sigue intentándolo.",
+    "* Para... no me mires así...",
+    "* Es que... me dolió mucho lo que dijiste...",
+    "* De verdad lo sientes... ¿no?",
+    "* ...Vale. Te perdono.\n* Pero más te vale quererme MUCHO."
+];
+const laughTexts=[
+    "* ¿¡Te estás RIENDO?! ¡Esto es SERIO!",
+    "* No tiene gracia...",
+    "* Cada vez que te ríes me duele más...",
+    "* ¿Sabes qué? Olvida la disculpa anterior."
+];
+const enemyAttackTexts=[
+    "* ¡Toma esto!","* ¡No te escaparás de mi amor!",
+    "* ¡Siente el poder de mis sentimientos!","* ¡Esquiva esto si puedes!",
+    "* ¡Mi corazón roto te persigue!"
+];
+const enemyIdleTexts=[
+    "* ... te mira fijamente.","* ... está esperando.",
+    "* ... parece triste.","* ... suspira profundamente."
+];
+
+// Typewriter
+let twInt=null,twDone=false,twFull='',twCb=null;
+
+function showDialog(text,cb){
+    B.phase='dialog';
+    const el=document.getElementById('dialogText'),adv=document.getElementById('dialogAdvance');
+    twFull=text; twCb=cb; twDone=false; adv.style.display='none'; el.innerHTML='';
+    let i=0;
+    clearInterval(twInt);
+    twInt=setInterval(()=>{
+        if(i<text.length){el.innerHTML=text.substring(0,i+1);i++}
+        else{clearInterval(twInt);twDone=true;if(twCb)adv.style.display='block'}
+    },30);
+}
+
+function handleDialogClick(){if(B.phase==='dialog')advanceDialog()}
+
+let keysDown={};
+document.addEventListener('keydown',e=>{
+    keysDown[e.key]=true;
+    if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key))e.preventDefault();
+    if(e.key==='z'||e.key==='Z'||e.key==='Enter'||e.key===' '){
+        if(B.phase==='dialog'){advanceDialog();return}
+        if(B.phase==='fight'){stopAttackBar();return}
+    }
+});
+document.addEventListener('keyup',e=>{keysDown[e.key]=false});
+
+function advanceDialog(){
+    if(!twDone){
+        clearInterval(twInt);
+        document.getElementById('dialogText').innerHTML=twFull;
+        twDone=true;
+        if(twCb)document.getElementById('dialogAdvance').style.display='block';
+        return;
+    }
+    if(twCb){
+        const cb=twCb;twCb=null;
+        document.getElementById('dialogAdvance').style.display='none';
+        cb();
+    }
+}
+
+function startBattleTransition(){
+    stopAllMusic(); // Stop conversation music
+    document.getElementById('conversationPhase').style.display='none';
+    const t=document.getElementById('battleTransition');t.style.display='flex';
+    setTimeout(()=>{t.style.display='none';document.getElementById('battlePhase').style.display='flex';initBattle()},1800);
+}
+
+function initBattle(){
+    B={enemyHp:100,enemyMaxHp:100,playerHp:20,playerMaxHp:20,apologyCount:0,phase:'none'};
+    playMusic('battleMusic',0.5);
+    setSprite('idle');updateHp();hideUI();
+    showDialog("* Tu novio te bloquea el paso.\n* Parece muy enfadado...",()=>{playerTurn()});
+}
+
+function hideUI(){
+    document.getElementById('battleActions').style.display='none';
+    document.getElementById('actSubmenu').style.display='none';
+    document.getElementById('attackBar').style.display='none';
+    document.getElementById('battleBox').style.display='none';
+}
+
+function setSprite(s){
+    const el=document.getElementById('enemySprite');
+    if(s==='idle')el.src='resources/image9.png';
+    else if(s==='hurt')el.src='resources/image10.png';
+    else if(s==='talk')el.src='.resources/image11.png';
+}
+
+function updateHp(){
+    const pct=Math.max(0,B.enemyHp/B.enemyMaxHp*100);
+    const bar=document.getElementById('enemyHpBar');
+    bar.style.width=pct+'%';
+    bar.className='hp-bar-inner'+(pct<=25?' critical':pct<=50?' low':'');
+    document.getElementById('enemyHpText').textContent=`HP ${Math.max(0,B.enemyHp)} / ${B.enemyMaxHp}`;
+    const pp=Math.max(0,B.playerHp/B.playerMaxHp*100);
+    document.getElementById('playerHpBar').style.width=pp+'%';
+    document.getElementById('playerHpText').textContent=`${Math.max(0,B.playerHp)} / ${B.playerMaxHp}`;
+}
+
+// === PLAYER TURN ===
+function playerTurn(){
+    B.phase='playerChoice';
+    hideUI();
+    document.getElementById('battleActions').style.display='flex';
+    setSprite('idle');
+    clearInterval(twInt);twDone=true;twCb=null;
+    document.getElementById('dialogAdvance').style.display='none';
+    document.getElementById('dialogText').innerHTML=enemyIdleTexts[Math.floor(Math.random()*enemyIdleTexts.length)];
+}
+
+// === FIGHT ===
+let atkActive=false,atkPos=0,atkDir=1,atkAnim=null;
+
+function selectFight(){
+    if(B.phase!=='playerChoice')return;
+    B.phase='fight';
+    hideUI();
+    document.getElementById('attackBar').style.display='block';
+    clearInterval(twInt);twDone=true;twCb=null;
+    document.getElementById('dialogAdvance').style.display='none';
+    document.getElementById('dialogText').innerHTML="* ¡Pulsa Z, ENTER o ESPACIO!";
+    atkActive=true;atkPos=0;atkDir=1;
+    animateAtk();
+}
+
+function animateAtk(){
+    if(!atkActive)return;
+    const c=document.getElementById('attackBar'),cur=document.getElementById('attackCursor');
+    const maxW=c.offsetWidth-8;
+    atkPos+=atkDir*4;
+    if(atkPos>=maxW){atkPos=maxW;atkDir=-1}
+    if(atkPos<=0){atkPos=0;atkDir=1}
+    cur.style.left=atkPos+'px';
+    atkAnim=requestAnimationFrame(animateAtk);
+}
+
+function stopAttackBar(){
+    if(!atkActive)return;
+    atkActive=false;cancelAnimationFrame(atkAnim);
+    const c=document.getElementById('attackBar');
+    const greenCenter=c.offsetWidth/2, curCenter=atkPos+4;
+    const dist=Math.abs(curCenter-greenCenter), maxD=c.offsetWidth/2;
+    let dmg=0;
+    if(dist<20)dmg=25;
+    else if(dist<maxD*.4)dmg=Math.max(5,Math.round(25*(1-dist/(maxD*.5))));
+    else if(dist<maxD*.7)dmg=Math.max(1,Math.round(5*(1-dist/maxD)));
+    c.style.display='none';
+    if(dmg>0)applyDamage(dmg);
+    else showDialog("* ¡FALLO!",()=>{enemyTurn()});
+}
+
+function applyDamage(dmg){
+    B.phase='animating';
+    B.enemyHp=Math.max(0,B.enemyHp-dmg);
+    setSprite('hurt');
+    const spr=document.getElementById('enemySprite');
+    spr.classList.add('hurt');
+    drawSlash();
+    const pop=document.createElement('div');pop.className='damage-popup';
+    pop.textContent=dmg===25?'25 !!!':String(dmg);
+    pop.style.top='40px';pop.style.left='50%';pop.style.transform='translateX(-50%)';
+    document.getElementById('enemySpriteWrap').appendChild(pop);
+    setTimeout(()=>pop.remove(),1500);
+    updateHp();
+    document.getElementById('dialogText').innerHTML=`* ¡Le hiciste ${dmg} de daño!`;
+    document.getElementById('dialogAdvance').style.display='none';
+    clearInterval(twInt);twDone=true;twCb=null;
+
+    setTimeout(()=>{
+        spr.classList.remove('hurt');setSprite('idle');clearSlash();
+        if(B.enemyHp<=0)showBattleVictory();
+        else showDialog(`* ¡Le hiciste ${dmg} de daño!`,()=>{enemyTurn()});
+    },1000);
+}
+
+function drawSlash(){
+    const ctx=document.getElementById('slashCanvas').getContext('2d');
+    ctx.clearRect(0,0,260,260);
+    ctx.strokeStyle='#fff';ctx.lineWidth=6;ctx.beginPath();ctx.moveTo(30,230);ctx.lineTo(230,30);ctx.stroke();
+    ctx.strokeStyle='#ff0000';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(32,228);ctx.lineTo(232,28);ctx.stroke();
+}
+function clearSlash(){document.getElementById('slashCanvas').getContext('2d').clearRect(0,0,260,260)}
+
+// === ACT ===
+function selectAct(){
+    if(B.phase!=='playerChoice')return;
+    B.phase='actMenu';
+    document.getElementById('battleActions').style.display='none';
+    document.getElementById('actSubmenu').style.display='flex';
+    setSprite('talk');
+    clearInterval(twInt);twDone=true;twCb=null;
+    document.getElementById('dialogAdvance').style.display='none';
+    document.getElementById('dialogText').innerHTML="* ¿Qué quieres decir?";
+}
+
+function doApologize(){
+    if(B.phase!=='actMenu')return;
+    document.getElementById('actSubmenu').style.display='none';
+    B.apologyCount++;setSprite('talk');
+    if(B.apologyCount>=6){
+        showDialog(apologyTexts[5],()=>{showMercyEnding()});
+    } else {
+        const txt=apologyTexts[Math.min(B.apologyCount-1,4)];
+        showDialog(txt+`\n* (Disculpas: ${B.apologyCount}/6)`,()=>{enemyTurn()});
+    }
+}
+
+function doLaugh(){
+    if(B.phase!=='actMenu')return;
+    document.getElementById('actSubmenu').style.display='none';
+    B.apologyCount=Math.max(0,B.apologyCount-1);
+    setSprite('idle');
+    const txt=laughTexts[Math.floor(Math.random()*laughTexts.length)];
+    showDialog(txt+`\n* (Disculpas: ${B.apologyCount}/6)`,()=>{enemyTurn()});
+}
+
+// === ENEMY TURN ===
+function enemyTurn(){
+    hideUI();setSprite('talk');
+    const txt=enemyAttackTexts[Math.floor(Math.random()*enemyAttackTexts.length)];
+    showDialog(txt,()=>{setSprite('idle');startDodge()});
+}
+
+// === DODGE ===
+let playerX,playerY,dodgeActive=false,dodgeTimer=null,projectiles=[],dodgeFrame=null;
+
+function startDodge(){
+    B.phase='dodge';hideUI();
+    const box=document.getElementById('battleBox');box.style.display='block';
+    const heart=document.getElementById('playerHeart');
+    playerX=(box.offsetWidth-28)/2;playerY=(box.offsetHeight-28)/2;
+    heart.style.left=playerX+'px';heart.style.top=playerY+'px';
+    dodgeActive=true;projectiles=[];keysDown={};
+
+    clearInterval(twInt);twDone=true;twCb=null;
+    document.getElementById('dialogAdvance').style.display='none';
+    document.getElementById('dialogText').innerHTML="* ¡Esquiva los ataques!";
+
+    let sc=0;const sm=22;
+    const si=setInterval(()=>{if(!dodgeActive||sc>=sm){clearInterval(si);return}spawnProj();sc++},280);
+    dodgeTimer=setTimeout(()=>{endDodge()},6500);
+    dodgeFrame=requestAnimationFrame(dodgeLoop);
+}
+
+function spawnProj(){
+    const box=document.getElementById('battleBox'),bw=box.offsetWidth,bh=box.offsetHeight;
+    const p=document.createElement('div');p.className='projectile';
+    p.textContent=['💔','💢','❣️','🖤'][Math.floor(Math.random()*4)];
+    p.style.fontSize=(20+Math.random()*12)+'px';
+    const side=Math.floor(Math.random()*4);
+    let x,y,vx,vy;const spd=1.5+Math.random()*2;
+    switch(side){
+        case 0:x=Math.random()*bw;y=-24;vx=(Math.random()-.5)*spd;vy=spd;break;
+        case 1:x=Math.random()*bw;y=bh;vx=(Math.random()-.5)*spd;vy=-spd;break;
+        case 2:x=-24;y=Math.random()*bh;vx=spd;vy=(Math.random()-.5)*spd;break;
+        case 3:x=bw;y=Math.random()*bh;vx=-spd;vy=(Math.random()-.5)*spd;break;
+    }
+    p.style.left=x+'px';p.style.top=y+'px';
+    box.appendChild(p);
+    projectiles.push({el:p,x,y,vx,vy,w:20,h:20});
+}
+
+function dodgeLoop(){
+    if(!dodgeActive)return;
+    const box=document.getElementById('battleBox'),bw=box.offsetWidth,bh=box.offsetHeight;
+    const heart=document.getElementById('playerHeart'),spd=3.5;
+    if(keysDown['ArrowUp']||keysDown['w']||keysDown['W'])playerY-=spd;
+    if(keysDown['ArrowDown']||keysDown['s']||keysDown['S'])playerY+=spd;
+    if(keysDown['ArrowLeft']||keysDown['a']||keysDown['A'])playerX-=spd;
+    if(keysDown['ArrowRight']||keysDown['d']||keysDown['D'])playerX+=spd;
+    playerX=Math.max(0,Math.min(bw-28,playerX));
+    playerY=Math.max(0,Math.min(bh-28,playerY));
+    heart.style.left=playerX+'px';heart.style.top=playerY+'px';
+
+    for(let i=projectiles.length-1;i>=0;i--){
+        const pr=projectiles[i];
+        pr.x+=pr.vx;pr.y+=pr.vy;
+        pr.el.style.left=pr.x+'px';pr.el.style.top=pr.y+'px';
+        if(pr.x<-50||pr.x>bw+50||pr.y<-50||pr.y>bh+50){pr.el.remove();projectiles.splice(i,1);continue}
+        if(pr.x<playerX+24&&pr.x+pr.w>playerX+4&&pr.y<playerY+24&&pr.y+pr.h>playerY+4){
+            B.playerHp-=2;updateHp();pr.el.remove();projectiles.splice(i,1);
+            heart.style.opacity='.3';setTimeout(()=>{heart.style.opacity='1'},200);
+            if(B.playerHp<=0){endDodge();showGameOver();return}
+        }
+    }
+    dodgeFrame=requestAnimationFrame(dodgeLoop);
+}
+
+function endDodge(){
+    dodgeActive=false;clearTimeout(dodgeTimer);cancelAnimationFrame(dodgeFrame);
+    projectiles.forEach(p=>p.el.remove());projectiles=[];
+    document.getElementById('battleBox').style.display='none';
+    if(B.playerHp>0)playerTurn();
+}
+
+// === ENDINGS ===
+function showBattleVictory(){
+    stopAllMusic();
+    playMusic('determinationMusic',0.5);
+    document.getElementById('battlePhase').style.display='none';
+    const end=document.getElementById('battleEndScreen');end.style.display='flex';
+    end.innerHTML=`<div class="emoji-big">⚔️</div>
+        <div style="font-size:2.5rem;color:#ffff00;letter-spacing:3px;margin-bottom:20px">* ¡Has ganado la pelea!</div>
+        <div style="font-size:1.5rem;color:#aaa;letter-spacing:2px;margin-bottom:30px">* Pero... ¿a qué coste?</div>
+        <div style="font-size:1.2rem;color:#666">* Nuestro amor se desvanece...</div>
+        <div style="font-size:1.2rem;color:#666">* Igualmente ganaste algu... :( --> RA-PCCEQ6BTWRUQQ7KY</div>`;
+}
+
+function showMercyEnding(){
+    stopAllMusic();
+    playMusic('determinationMusic',0.5);
+    document.getElementById('battlePhase').style.display='none';
+    const end=document.getElementById('battleEndScreen');end.style.display='flex';
+    end.innerHTML=`<div class="emoji-big">💕</div>
+        <div class="te-amo-text" style="margin-bottom:30px">T E  A M O</div>
+        <div style="font-size:1.8rem;color:#ffb6c1;letter-spacing:3px;margin-bottom:15px">* Al final... sí seré tu San Valentín... Gorda Puta...</div>
+        <div style="font-size:1.4rem;color:#ff6b9d;letter-spacing:2px">* ¡Pero que no se repita! >:(</div>
+        <div style="font-size:1.4rem;color:#ff6b9d;letter-spacing:2px">* Toma amur: "RA-PFWXN7QSJ3FPXBFY"</div>`;
+    createPixelConfetti();createFloatingHearts();
+}
+
+function showGameOver(){
+    stopAllMusic();
+    playMusic('determinationMusic',0.5);
+    document.getElementById('battlePhase').style.display='none';
+    const end=document.getElementById('battleEndScreen');end.style.display='flex';
+    end.innerHTML=`<div style="font-size:4rem;color:#ff0000;letter-spacing:5px;margin-bottom:30px">GAME OVER</div>
+        <div style="font-size:1.5rem;color:#888;letter-spacing:2px;margin-bottom:40px">* Te pesa demasiado el culo...</div>
+        <button class="btn" onclick="location.reload()" style="border-color:#ffff00;color:#ffff00;max-width:350px;text-align:center;cursor:pointer;font-size:1.3rem">* Volver a intentar</button>`;
+}
+</script>
+</body>
+</html>
